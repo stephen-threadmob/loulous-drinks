@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand colors as space-separated RGB channels so Tailwind's <alpha-value>
+     works. Overridden per-restaurant at runtime by <ThemeStyle>. */
+  --brand-primary: 28 28 28;      /* #1c1c1c near-black */
+  --brand-secondary: 176 141 87;  /* #b08d57 antique brass */
+  --brand-bg: 244 239 228;        /* #f4efe4 warm cream */
+  --brand-surface: 255 255 255;
+  --brand-ink: 28 28 28;
+  --brand-muted: 110 110 110;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: rgb(var(--brand-bg));
+  color: rgb(var(--brand-ink));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* Respect iOS safe areas for the sticky cart bar. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Focus ring for keyboard accessibility */
+:focus-visible {
+  outline: 3px solid rgb(var(--brand-secondary));
+  outline-offset: 2px;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold
+           transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+    min-height: 48px; /* large tap target */
+    padding: 0 1.25rem;
+  }
+  .btn-primary {
+    @apply btn text-white;
+    background-color: rgb(var(--brand-primary));
+  }
+  .btn-secondary {
+    @apply btn;
+    background-color: rgb(var(--brand-secondary));
+    color: #fff;
+  }
+  .btn-ghost {
+    @apply btn border;
+    border-color: rgb(var(--brand-ink) / 0.15);
+    background: rgb(var(--brand-surface));
+  }
+  .card {
+    @apply rounded-2xl bg-white shadow-card;
+  }
+  .input {
+    @apply w-full rounded-xl border bg-white px-4 text-base;
+    min-height: 48px;
+    border-color: rgb(var(--brand-ink) / 0.18);
+  }
+  .input:focus {
+    border-color: rgb(var(--brand-secondary));
+    outline: none;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium;
+    color: rgb(var(--brand-ink) / 0.75);
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+}
+
+/* Print: show only the QR poster when printing from the QR page. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #qr-poster,
+  #qr-poster * {
+    visibility: visible;
+  }
+  #qr-poster {
+    position: absolute;
+    inset: 0;
+    margin: 0 auto;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Hide number input spinners (table number, quantity) for a cleaner look */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
