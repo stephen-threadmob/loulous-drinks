@@ -38,7 +38,9 @@ export async function GET(req: NextRequest) {
       });
     }
     const buffer = await QRCode.toBuffer(target, { ...options, type: "png" });
-    return new NextResponse(buffer, {
+    // Wrap in Uint8Array: newer @types/node no longer treat a Node Buffer as a
+    // valid web `BodyInit`, so pass a Uint8Array (which is one) to NextResponse.
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "content-type": "image/png",
         ...(download && {
