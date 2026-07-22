@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
-  const router = useRouter();
+// The form is split out so the useSearchParams() call sits inside a <Suspense>
+// boundary. Next.js 14 requires this, otherwise `next build` fails when it tries
+// to prerender this page.
+function LoginForm() {
   const params = useSearchParams();
   const redirectTo = params.get("redirect") || "/admin/dashboard";
 
@@ -42,63 +44,67 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-brand-bg px-4">
-      <div className="card w-full max-w-sm p-8">
-        <h1 className="font-display text-2xl font-bold text-brand-ink">
-          Staff sign in
-        </h1>
-        <p className="mt-1 text-sm text-brand-muted">
-          Lou Lou&apos;s + Foster&apos;s order dashboard
-        </p>
+    <div className="card w-full max-w-sm p-8">
+      <h1 className="font-display text-2xl font-bold text-brand-ink">
+        Staff sign in
+      </h1>
+      <p className="mt-1 text-sm text-brand-muted">
+        Lou Lou&apos;s + Foster&apos;s order dashboard
+      </p>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-          <div>
-            <label className="label" htmlFor="email">
-              Email <span aria-hidden className="text-red-600">*</span>
-            </label>
-            <input
-              id="email"
-              className="input"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="label" htmlFor="password">
-              Password <span aria-hidden className="text-red-600">*</span>
-            </label>
-            <input
-              id="password"
-              className="input"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+        <div>
+          <label className="label" htmlFor="email">
+            Email <span aria-hidden className="text-red-600">*</span>
+          </label>
+          <input
+            id="email"
+            className="input"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="label" htmlFor="password">
+            Password <span aria-hidden className="text-red-600">*</span>
+          </label>
+          <input
+            id="password"
+            className="input"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-          {error && (
-            <p
-              role="alert"
-              className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
-            >
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            className="btn-primary w-full"
-            disabled={loading}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
           >
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-      </div>
+            {error}
+          </p>
+        )}
+
+        <button type="submit" className="btn-primary w-full" disabled={loading}>
+          {loading ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-brand-bg px-4">
+      <Suspense fallback={<div className="text-brand-muted">Loading…</div>}>
+        <LoginForm />
+      </Suspense>
     </main>
   );
 }
